@@ -1,0 +1,200 @@
+<!DOCTYPE html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Magic Coloring 1.5 🦄</title><style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#ffe5f5,#e5f3ff);color:#51375d}main{max-width:1050px;margin:auto;padding:12px}h1{text-align:center;margin:8px;font-size:clamp(26px,5vw,40px)}button,.upload{border:0;border-radius:18px;background:white;color:#51375d;font-weight:750;padding:13px 17px;box-shadow:0 3px 0 #dfc8e7;cursor:pointer;font-size:16px;touch-action:manipulation}html,body{touch-action:manipulation;-webkit-text-size-adjust:100%}#paper,#paper *{touch-action:none}button:active{transform:translateY(2px)}button.active{background:#b5e9ff;outline:3px solid #7bb8f3}.row{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin:10px 0}.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.tile{background:#fff;border:4px solid #fff;border-radius:24px;overflow:hidden;box-shadow:0 6px 18px #ae91b744;padding:8px;cursor:pointer;text-align:center;font-weight:800;font-size:18px}.tile svg{width:100%;height:auto;max-height:190px}.tile span{display:block;padding:6px}.hide{display:none!important}#paper{background:white;border:8px solid white;border-radius:24px;box-shadow:0 6px 22px #ae91b744;display:block;margin:10px auto;touch-action:none;width:min(100%,650px);aspect-ratio:1/1}#paper svg{width:100%;height:100%;display:block;touch-action:none}#palette{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}.swatch{width:49px;height:49px;border-radius:50%;border:4px solid white;box-shadow:0 2px 5px #8765a966;padding:0}.swatch.selected{outline:4px solid #5d3c81;transform:scale(1.07)}.subtitle{text-align:center;font-weight:650}#brushlayer{pointer-events:none}#file{display:none}#toast{text-align:center;min-height:25px;font-weight:750} @media(max-width:650px){.gallery{grid-template-columns:repeat(2,1fr)}.tile{font-size:16px}.row button,.upload{font-size:14px;padding:10px 12px}#paper{border-width:5px}.swatch{width:43px;height:43px}}
+
+/* iPad landscape workspace */
+html,body{overscroll-behavior:none}body.editing{overflow:hidden;position:fixed;inset:0;width:100%;height:100%;height:100dvh}body.editing main{height:100%;max-width:none;display:flex;flex-direction:column;padding:5px 12px}body.editing h1{font-size:clamp(19px,3vh,27px);margin:1px}body.editing .subtitle{display:none}body.editing #editor{flex:1;min-height:0}#workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,260px);grid-template-rows:auto minmax(0,1fr);gap:7px 12px;height:100%;min-height:0;align-items:stretch}#tools{grid-column:1/-1;margin:0;align-items:center}#paper{grid-column:1;grid-row:2;width:auto;height:100%;max-width:100%;max-height:100%;aspect-ratio:1;justify-self:center;align-self:center;margin:0;border:5px solid white;overflow:hidden;touch-action:none;overscroll-behavior:contain;user-select:none;-webkit-user-select:none}#sidebar{grid-column:2;grid-row:2;display:flex;flex-direction:column;justify-content:center;min-height:0;gap:7px}#palettetabs button,#effects button{padding:7px;font-size:12px}#effects{margin:2px 0;gap:4px}#palette{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;justify-items:center;align-content:center}.swatch{width:clamp(29px,4.6vw,52px);height:clamp(29px,4.6vw,52px)}#secondary{margin:0}#secondary button{padding:9px;font-size:13px}#toast{font-size:13px;min-height:20px}#paintCanvas{touch-action:none!important;-webkit-user-select:none;user-select:none}body.editing #paper,body.editing #paper *{touch-action:none!important}#paper{position:relative}#glitterCanvas{display:block}
+@media (orientation:portrait){#workspace{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto}#tools{grid-column:1;grid-row:1}#paper{grid-column:1;grid-row:2}#sidebar{grid-column:1;grid-row:3;gap:4px}#palette{grid-template-columns:repeat(14,minmax(0,1fr));gap:2px}.swatch{width:clamp(19px,5vw,39px);height:clamp(19px,5vw,39px);border-width:2px}#secondary button{padding:6px}body.editing h1{font-size:18px}}
+@media (max-height:540px) and (orientation:landscape){body.editing h1{font-size:17px}#tools button{padding:6px 10px;font-size:12px}.swatch{width:clamp(27px,5vh,42px);height:clamp(27px,5vh,42px)}}
+.swatch.sparkle{color:white;text-shadow:0 0 3px #333;font-size:23px;background-image:radial-gradient(circle at 25% 25%,#ffffff99 0 2px,transparent 3px),radial-gradient(circle at 70% 65%,#ffffffaa 0 2px,transparent 3px)!important;background-blend-mode:screen}body.editing footer{display:none}
+/* Magic Coloring 1.5 — illustrated pastel iPad layout */
+:root{--violet:#6941cc;--pink:#ff5ab9;--lavender:#e9d8ff}
+body{background:radial-gradient(circle at 50% 2%,#fff0ff 0,#e7ceff 38%,#c5d9ff 100%);color:#40217d}
+main{max-width:1600px;padding:10px 18px}
+h1{font-weight:1000;letter-spacing:-1.5px;color:#fff;font-size:clamp(30px,4.4vw,62px);line-height:1.02;text-shadow:-3px -3px 0 #7135c3,3px -3px 0 #7135c3,-3px 3px 0 #7135c3,3px 3px 0 #7135c3,0 6px 0 #a955c7,0 9px 15px #a668cb;margin:9px 0 18px}
+h1 small{display:block!important;font-size:clamp(13px,1.6vw,23px)!important;letter-spacing:0;color:white;text-shadow:0 2px 3px #5833a5;margin-top:9px}
+h1::before{content:'🌈';margin-right:12px}h1::after{content:'✨';margin-left:12px}
+.gallery{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tile{border:3px solid #b39afc;border-radius:30px;box-shadow:0 5px 0 #b8a4ef,0 9px 20px #8b65c644;background:#fff;padding:8px;transition:transform .15s}
+.tile:active{transform:scale(.97)}
+.tile svg,.tile img{width:100%!important;height:clamp(125px,20vw,285px)!important;max-height:none!important;object-fit:contain!important}
+.tile span{font-size:clamp(13px,1.5vw,20px);color:#5a2ba3}
+button,.upload{border:2px solid #c6a5ff;background:linear-gradient(#fff,#f8eaff);color:#5b29a6;box-shadow:0 4px 0 #c3a8f1;font-weight:850}
+button.active{background:linear-gradient(#ffa5df,#ff58bb);color:white;outline:2px solid #fff;box-shadow:0 4px 0 #b95acf}
+#workspace{background:#f4e8ffcc;border:3px solid #d2adff;border-radius:30px;padding:12px;box-shadow:0 6px 16px #a479bd55}
+#paper{border:5px solid #b49af7;border-radius:24px;box-shadow:0 4px 0 #b8a3ee}
+.swatch{border:3px solid white;box-shadow:0 0 0 2px #bba4ff,0 3px 6px #7551ac44}
+.swatch.selected{outline:3px solid #8b39e0}
+#sidebar{background:#f9f1ffbb;border-radius:24px;padding:10px}
+#palettetabs button{font-size:clamp(11px,1.3vw,16px);border-radius:30px}
+#effects button{border-radius:17px;font-size:clamp(11px,1.3vw,16px);padding:12px 8px}
+#secondary button{border-radius:18px}
+body.editing main{padding:4px 10px}
+body.editing h1{font-size:clamp(20px,3.5vh,35px);margin:2px 0 7px}
+body.editing h1 small{font-size:clamp(10px,1.5vh,14px)!important;margin-top:2px}
+body.editing #workspace{grid-template-columns:minmax(0,1fr) minmax(200px,310px)}
+@media (orientation:landscape) and (min-width:850px){
+ body.editing #workspace{grid-template-columns:minmax(0,1fr) minmax(225px,360px)}
+ #palette{grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+@media(max-width:750px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:8px}.tile{border-radius:18px}h1{font-size:clamp(27px,7vw,42px)}}
+@media (orientation:portrait){body.editing #workspace{grid-template-columns:1fr}#sidebar{padding:5px}#effects{flex-wrap:nowrap}#effects button{padding:5px}body.editing #paper{max-height:60vh}}
+</style></head><body><main><h1>🦄 Magic Coloring 🌈 <small style="font-size:12px">v1.5 · Made by Mikkel</small></h1><p class="subtitle">Vælg et billede, og mal med dine yndlingsfarver! ✨</p>
+<section id="home"><div class="gallery" id="gallery"></div></section>
+<section id="editor" class="hide"><div id="workspace"><div class="row" id="tools"><button id="back">🏠 Billeder</button><button id="fill" class="active">🪣 Fyld felter</button><button id="brush">🖌️ Pensel</button><button id="size">● Pensel: mellem</button></div><div id="paper"></div><div id="sidebar"><div class="row" id="palettetabs"><button id="normalTab" class="active">🎨 Farver</button><button id="glitterTab">✨ Magiske farver</button></div><div class="row hide" id="effects"><button class="effect active" data-effect="sparkle">✨ Glimmer</button><button class="effect" data-effect="diamond">💎 Diamant</button><button class="effect" data-effect="rainbow">🌈 Regnbue</button></div><div id="palette"></div><div class="row" id="secondary"><button id="undo">↶ Fortryd</button><button id="clear">✨ Start forfra</button><button id="download">💾 Gem billede</button></div><div id="toast" aria-live="polite"></div></div></div></section><footer style="text-align:center;font-size:12px;padding:6px">Magic Coloring v1.5 · Made by Mikkel 💖</footer></main>
+<script>
+const NS='http://www.w3.org/2000/svg',S=(tag,attrs={},children='')=>`<${tag} ${Object.entries(attrs).map(([k,v])=>`${k}="${v}"`).join(' ')}>${children}</${tag}>`;
+const shape=(tag,attrs)=>S(tag,{...attrs,fill:'white',stroke:'#393047','stroke-width':5,'stroke-linecap':'round','stroke-linejoin':'round','data-paint':'1'});
+const circle=(x,y,r)=>shape('circle',{cx:x,cy:y,r}),ellipse=(x,y,rx,ry)=>shape('ellipse',{cx:x,cy:y,rx,ry}),path=d=>shape('path',{d}),rect=(x,y,w,h,rx=10)=>shape('rect',{x,y,width:w,height:h,rx});
+function heart(x,y,s=1){return `<g transform="translate(${x} ${y}) scale(${s})">${path('M 0 18 C -65 -20 -37 -60 0 -32 C 37 -60 65 -20 0 18 Z')}</g>`}
+function star(x,y,r=24){let pts=[];for(let i=0;i<10;i++){let a=-Math.PI/2+i*Math.PI/5,q=i%2?r*.45:r;pts.push(`${x+Math.cos(a)*q},${y+Math.sin(a)*q}`)}return shape('polygon',{points:pts.join(' ')})}
+function cloud(x,y){return `<g transform="translate(${x} ${y})">${path('M -65 25 Q -85 -4 -48 -20 Q -45 -58 -5 -45 Q 32 -78 58 -36 Q 100 -32 83 10 Q 78 30 45 28 Z')}</g>`}
+function rainbow(){let out='';for(let i=0;i<6;i++){let r=205-i*24;out+=path(`M ${250-r} 340 A ${r} ${r} 0 0 1 ${250+r} 340 L ${250+r-24} 340 A ${r-24} ${r-24} 0 0 0 ${250-r+24} 340 Z`)}return out+cloud(90,343)+cloud(403,343)+star(80,100)+star(422,102)}
+function unicorn(){return `${ellipse(253,365,113,96)}${path('M 178 324 Q 112 267 143 195 Q 191 191 221 261 Z')}${path('M 312 320 Q 383 259 357 192 Q 314 198 281 261 Z')}${path('M 222 194 L 257 72 L 289 194 Z')}${ellipse(250,265,102,105)}${path('M 171 241 Q 169 152 236 171 Q 273 126 326 197 Q 289 195 278 224 Q 240 192 218 236 Z')}${ellipse(218,275,10,15)}${ellipse(289,275,10,15)}${ellipse(251,313,28,20)}${circle(240,311,3)}${circle(263,311,3)}${heart(394,180,.75)}${star(102,115,24)}`}
+function butterfly(){return `${ellipse(188,205,88,112)}${ellipse(312,205,88,112)}${ellipse(183,325,75,80)}${ellipse(317,325,75,80)}${ellipse(250,267,24,128)}${circle(250,142,26)}${path('M 236 122 Q 195 60 174 105')}${path('M 264 122 Q 305 60 326 105')}${circle(169,204,26)}${circle(331,204,26)}${circle(181,330,23)}${circle(319,330,23)}`}
+function kitty(){return `${path('M 147 216 L 145 100 L 224 153 Q 250 141 277 153 L 353 100 L 353 216 Q 393 317 323 373 Q 250 419 177 373 Q 109 316 147 216 Z')}${path('M 166 179 L 166 139 L 203 168 Z')}${path('M 333 179 L 333 139 L 297 168 Z')}${ellipse(208,263,12,17)}${ellipse(292,263,12,17)}${path('M 235 300 Q 250 316 265 300 Z')}${path('M 250 316 Q 230 346 210 320')}${path('M 250 316 Q 270 346 290 320')}${path('M 179 306 L 104 291')}${path('M 179 322 L 105 329')}${path('M 321 306 L 396 291')}${path('M 321 322 L 395 329')}${heart(394,120,.75)}`}
+function bunny(){return `${ellipse(201,145,42,112)}${ellipse(299,145,42,112)}${ellipse(201,145,20,80)}${ellipse(299,145,20,80)}${ellipse(250,310,126,124)}${ellipse(206,295,12,16)}${ellipse(294,295,12,16)}${heart(250,328,.4)}${ellipse(185,355,22,14)}${ellipse(315,355,22,14)}${star(95,350)}${star(405,350)}`}
+function hearts(){return heart(250,205,2.5)+heart(115,365,1.2)+heart(388,370,1.25)+heart(92,100,.85)+heart(407,100,.85)+star(252,409,25)+star(250,55,22)}
+
+function royalUnicorn(){let o='';o+=cloud(90,105)+cloud(412,106);o+=star(75,270,22)+star(418,260,25);o+=heart(385,390,.65)+heart(105,390,.65);
+o+=ellipse(245,357,117,91);o+=path('M 331 347 Q 428 289 406 218 Q 379 271 340 274 Q 408 220 378 173 Q 353 235 317 257 Z');
+o+=path('M 160 347 Q 99 313 105 245 Q 149 258 189 299 Z');o+=path('M 213 192 L 254 55 L 289 191 Z');
+for(let i=0;i<5;i++)o+=path(`M ${230+i*7} ${170-i*22} L ${252+i*5} ${165-i*22} L ${243+i*5} ${181-i*22} Z`);
+o+=path('M 164 247 L 142 143 Q 197 151 217 207 Z')+path('M 331 243 L 361 140 Q 300 153 285 210 Z');
+o+=ellipse(248,269,105,106);o+=path('M 157 233 Q 152 161 203 173 Q 219 126 264 165 Q 301 130 338 191 Q 306 190 296 229 Q 273 200 248 211 Q 211 191 193 246 Z');
+for(let i=0;i<5;i++)o+=path(`M ${170+i*30} 212 Q ${157+i*30} 176 ${191+i*30} 158 Q ${215+i*30} 190 ${194+i*30} 226 Z`);
+o+=ellipse(209,279,10,15)+ellipse(287,279,10,15)+ellipse(248,321,29,19)+circle(235,321,4)+circle(262,321,4);
+o+=path('M 183 352 Q 152 392 187 421 Q 216 398 205 367 Z')+path('M 308 350 Q 343 393 309 421 Q 280 397 288 368 Z');
+for(let i=0;i<4;i++)o+=star(155+i*62,455,13);return o}
+function flyingUnicorn(){let o='';o+=cloud(95,388)+cloud(402,385)+star(70,100,23)+star(422,100,24)+heart(392,200,.7);
+o+=path('M 165 285 Q 77 209 104 132 Q 145 173 189 199 Q 132 110 160 80 Q 211 145 235 224 Z');
+o+=path('M 333 281 Q 422 210 391 129 Q 349 168 311 198 Q 363 112 335 80 Q 284 148 269 224 Z');
+for(let i=0;i<3;i++)o+=path(`M ${120+i*22} ${180+i*20} Q ${142+i*18} ${154+i*17} ${198+i*14} ${251+i*12} Z`);
+for(let i=0;i<3;i++)o+=path(`M ${380-i*22} ${180+i*20} Q ${358-i*18} ${154+i*17} ${302-i*14} ${251+i*12} Z`);
+o+=ellipse(251,352,100,85)+path('M 196 292 L 175 195 Q 222 211 236 256 Z')+path('M 303 291 L 328 195 Q 280 211 268 256 Z');
+o+=path('M 231 242 L 250 105 L 273 243 Z')+ellipse(250,299,92,91);
+o+=path('M 163 281 Q 143 213 204 225 Q 217 188 261 218 Q 309 185 335 260 Q 298 241 289 276 Q 265 247 243 268 Q 201 249 190 293 Z');
+for(let i=0;i<4;i++)o+=path(`M ${176+i*38} 253 Q ${181+i*38} 214 ${205+i*36} 227 Q ${219+i*36} 255 ${194+i*36} 279 Z`);
+o+=ellipse(217,308,9,13)+ellipse(281,308,9,13)+heart(250,343,.37);
+o+=path('M 181 371 Q 137 425 182 445 Q 212 419 214 382 Z')+path('M 313 369 Q 360 426 316 445 Q 281 418 284 382 Z');
+return o}
+
+
+function ponyFull(){return `${ellipse(247,307,103,77)}${path('M 326 302 Q 425 242 418 176 Q 459 256 370 342 Z')}${path('M 334 307 Q 430 280 425 225 Q 457 326 361 355 Z')}${path('M 179 347 L 168 430 L 202 430 L 222 362 Z')}${path('M 285 356 L 291 430 L 327 430 L 325 344 Z')}${path('M 180 287 Q 141 245 162 198 L 190 150 L 272 160 L 297 218 L 270 277 Z')}${path('M 178 175 L 167 116 L 210 153 Z')}${path('M 256 164 L 283 116 L 276 190 Z')}${path('M 214 150 L 244 70 L 252 155 Z')}${ellipse(224,218,71,65)}${path('M 165 213 Q 141 140 208 137 Q 240 121 261 162 Q 227 152 218 192 Q 184 176 165 213 Z')}${path('M 184 161 Q 137 153 131 224 Q 151 235 169 218 Z')}${circle(250,219,8)}${ellipse(268,244,10,7)}${heart(246,320,.42)}${star(87,100)}${star(403,95)}${heart(402,409,.6)}`}
+function unicornGarden(){return `${ponyFull()}${path('M 58 434 Q 100 364 144 434 Z')}${path('M 354 440 Q 394 359 446 440 Z')}${circle(94,386,24)}${circle(119,399,24)}${circle(91,416,24)}${circle(69,402,24)}${circle(93,402,15)}${circle(407,388,22)}${circle(431,402,22)}${circle(406,424,22)}${circle(382,405,22)}${circle(406,405,14)}${star(355,85)}${heart(105,175,.6)}`}
+function unicornMoon(){return `${ponyFull()}${path('M 390 52 A 85 85 0 1 0 448 177 A 64 64 0 1 1 390 52 Z')}${star(83,110)}${star(322,65)}${star(443,270)}${heart(105,315,.7)}${star(85,405)}`}
+function dogFull(){return `${ellipse(252,310,111,91)}${path('M 177 346 L 168 430 L 208 430 L 221 358 Z')}${path('M 282 356 L 292 430 L 330 430 L 324 339 Z')}${path('M 335 286 Q 431 228 429 288 Q 421 335 354 338 Z')}${ellipse(233,194,96,85)}${path('M 168 148 Q 96 134 114 245 Q 148 262 181 220 Z')}${path('M 298 146 Q 370 121 354 244 Q 322 256 287 217 Z')}${ellipse(202,197,12,17)}${ellipse(264,197,12,17)}${ellipse(233,239,26,18)}${path('M 232 254 Q 211 280 191 257')}${path('M 232 254 Q 254 280 274 257')}${circle(115,86,25)}${star(398,95)}${heart(404,402,.7)}`}
+function catFull(){return `${ellipse(250,329,115,92)}${path('M 175 354 L 158 436 L 200 436 L 220 373 Z')}${path('M 288 373 L 299 436 L 338 436 L 327 351 Z')}${path('M 345 315 Q 445 292 415 190 Q 463 291 390 351 Z')}${path('M 160 197 L 157 101 L 218 149 Q 250 135 280 149 L 345 101 L 345 197 Q 375 280 313 305 Q 248 333 183 304 Q 126 276 160 197 Z')}${path('M 174 169 L 172 131 L 205 159 Z')}${path('M 327 169 L 328 131 L 295 159 Z')}${ellipse(215,220,11,16)}${ellipse(284,220,11,16)}${heart(250,256,.32)}${path('M 220 271 L 155 259')}${path('M 220 282 L 151 290')}${path('M 280 271 L 345 259')}${path('M 280 282 L 349 290')}${heart(400,95,.7)}${star(95,90)}`}
+function bunnyFull(){return `${ellipse(250,326,114,85)}${ellipse(205,398,42,34)}${ellipse(304,398,42,34)}${ellipse(210,136,36,110)}${ellipse(291,136,36,110)}${ellipse(210,136,18,81)}${ellipse(291,136,18,81)}${ellipse(250,241,95,88)}${ellipse(216,238,11,16)}${ellipse(283,238,11,16)}${heart(250,273,.35)}${ellipse(358,324,35,34)}${heart(400,111,.75)}${star(90,300)}${star(410,410)}`}
+
+const uploadedPictures=[['🦄 Enhjørning med regnbue','magic_assets/magic-unicorn.png']];
+const pictures=[['🐶 Hel hund',dogFull],['🐱 Hel kat',catFull],['🐰 Hel kanin',bunnyFull],['🦄 Enhjørning',unicorn],['🌈 Regnbue',rainbow],['🦋 Sommerfugl',butterfly],['🐱 Kat',kitty],['🐰 Kanin',bunny],['💖 Hjerter',hearts],['👑 Eventyr-enhjørning',royalUnicorn],['🪽 Flyvende enhjørning',flyingUnicorn]];
+const colors=['#ff4d89','#ff9bc5','#ed4e43','#ff9a35','#ffe44e','#99e34f','#2acb8c','#33b9e9','#4979f5','#9b68ee','#bd79b5','#8c5c3b','#444052','#ffffff'];
+const glitterColors=['#ff4d89','#ffb6e5','#f9c846','#76d4ff','#9a78f7','#64e4bd','#ff8c63','#d8d8e8'];let glitter=false,animation=null,paintLocked=false;let color=colors[0],mode='fill',brushSize=12,svg,strokes=[],history=[],custom=null,selected=0;
+const $=id=>document.getElementById(id);
+function svgContent(inner){return `<svg xmlns="${NS}" viewBox="0 0 500 500" id="art" style="background:white"><rect width="500" height="500" fill="white"/>${inner}<g id="brushlayer"></g></svg>`}
+function gallery(){ $('gallery').innerHTML=uploadedPictures.map(([name,url],i)=>`<div class="tile" data-upload="${i}"><img src="${url}" style="width:100%;height:190px;object-fit:contain"><span>${name}</span></div>`).join('')+pictures.map(([name,fn],i)=>`<div class="tile" data-index="${i}">${svgContent(fn())}<span>${name}</span></div>`).join('');document.querySelectorAll('.tile').forEach(t=>t.onclick=()=>t.dataset.upload!==undefined?openUploaded(+t.dataset.upload):open(+t.dataset.index))}
+const glitterCanvas=document.createElement('canvas');glitterCanvas.width=glitterCanvas.height=500;glitterCanvas.id='glitterCanvas';glitterCanvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;touch-action:none';
+const gctx=glitterCanvas.getContext('2d');let glitterAreas=[],glitterLoop=null,effect='sparkle';
+function resetGlitter(){glitterAreas=[];gctx.clearRect(0,0,500,500);if(glitterLoop!==null){cancelAnimationFrame(glitterLoop);glitterLoop=null}}
+function makeStars(queue,count){
+ const stars=[],step=Math.max(1,Math.floor(count/85));for(let i=0;i<count;i+=step){if(Math.random()>.8)continue;let pos=queue[i];stars.push({x:pos%500,y:Math.floor(pos/500),size:1+Math.random()*2.7,phase:Math.random()*6.28,speed:.7+Math.random()*1.8})}return stars;
+}
+function animateGlitter(t){
+ gctx.clearRect(0,0,500,500);
+ for(const area of glitterAreas){
+  if(area.effect==='rainbow'){
+   gctx.save();gctx.globalAlpha=.38;gctx.fillStyle=`hsl(${(t*.025+area.hue)%360},95%,65%)`;
+   // A gently changing translucent tint, clipped to the filled region.
+   if(area.maskCanvas){const off=area.maskCanvas,oc=area.overlayCtx;oc.clearRect(0,0,500,500);oc.fillStyle=`hsl(${(t*.025+area.hue)%360},95%,65%)`;oc.fillRect(0,0,500,500);oc.globalCompositeOperation='destination-in';oc.drawImage(off,0,0);oc.globalCompositeOperation='source-over';gctx.globalAlpha=.35;gctx.drawImage(area.overlay,0,0);gctx.globalAlpha=1}
+   gctx.restore();
+  }
+  for(const p of area.stars){let phase=t*.0025*p.speed+p.phase,tw=(Math.sin(phase)+1)/2;if(tw<.24)continue;
+   let sz=p.size*(.3+tw*.9)*(area.effect==='diamond'?1.6:1);
+   gctx.save();gctx.translate(p.x,p.y);gctx.rotate(phase*.1);gctx.globalAlpha=(tw-.18)*.95;
+   gctx.fillStyle=area.effect==='rainbow'?`hsl(${(t*.04+p.phase*70)%360},100%,80%)`:'#fff';
+   gctx.beginPath();gctx.moveTo(0,-sz*1.8);gctx.lineTo(sz*.22,-sz*.22);gctx.lineTo(sz*1.8,0);gctx.lineTo(sz*.22,sz*.22);gctx.lineTo(0,sz*1.8);gctx.lineTo(-sz*.22,sz*.22);gctx.lineTo(-sz*1.8,0);gctx.lineTo(-sz*.22,-sz*.22);gctx.closePath();gctx.fill();gctx.restore();
+  }
+ }
+ glitterLoop=requestAnimationFrame(animateGlitter)
+}
+function startGlitter(){if(glitterLoop===null)glitterLoop=requestAnimationFrame(animateGlitter)}
+const canvas=document.createElement('canvas');canvas.width=500;canvas.height=500;canvas.id='paintCanvas';canvas.style.cssText='width:100%;height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none';const ctx=canvas.getContext('2d',{willReadFrequently:true});let painting=false,last=null;
+function openUploaded(i){selected=-1-i;custom=null;history=[];openRaster(uploadedPictures[i][1])}
+function open(i){resetGlitter();if(animation)cancelAnimationFrame(animation);paintLocked=false;selected=i;custom=null;history=[];loadArt(svgContent(pictures[i][1]()))}
+function loadArt(markup){resetGlitter();if(animation)cancelAnimationFrame(animation);paintLocked=false;$('paper').replaceChildren(canvas,glitterCanvas);$('home').classList.add('hide');$('editor').classList.remove('hide');document.body.classList.add('editing');let blob=new Blob([markup],{type:'image/svg+xml'}),url=URL.createObjectURL(blob),im=new Image();im.onload=()=>{ctx.fillStyle='#fff';ctx.fillRect(0,0,500,500);ctx.drawImage(im,0,0,500,500);URL.revokeObjectURL(url);$('toast').textContent='Klar til at male! 🎨'};im.onerror=()=>{$('toast').textContent='Kunne ikke åbne tegningen'};im.src=url;setMode(custom?'brush':'fill')}
+function openRaster(src){
+ resetGlitter();if(animation)cancelAnimationFrame(animation);paintLocked=false;
+ $('paper').replaceChildren(canvas,glitterCanvas);$('home').classList.add('hide');$('editor').classList.remove('hide');document.body.classList.add('editing');
+ let im=new Image();im.onload=()=>{ctx.fillStyle='#fff';ctx.fillRect(0,0,500,500);ctx.drawImage(im,0,0,500,500);$('toast').textContent='Tryk på felterne for at farvelægge!';setMode('fill')};im.onerror=()=>{$('toast').textContent='Kunne ikke indlæse billedet'};im.src=src;
+}
+
+function snapshot(){history.push({pixels:ctx.getImageData(0,0,500,500),areas:glitterAreas.slice()});if(history.length>25)history.shift()}
+function point(ev){let r=canvas.getBoundingClientRect();return {x:Math.max(0,Math.min(499,Math.floor((ev.clientX-r.left)*500/r.width))),y:Math.max(0,Math.min(499,Math.floor((ev.clientY-r.top)*500/r.height)))}}
+function fillAt(x,y){
+ if(paintLocked)return false;
+ const img=ctx.getImageData(0,0,500,500),d=img.data,w=500,start=y*w+x,at=start*4;
+ const r=d[at],g=d[at+1],b=d[at+2];if(r<105&&g<105&&b<105)return false;
+ const rgb=[1,3,5].map(i=>parseInt(color.slice(i,i+2),16));
+ if(!glitter&&Math.abs(r-rgb[0])+Math.abs(g-rgb[1])+Math.abs(b-rgb[2])<15)return false;
+ const visited=new Uint8Array(250000),queue=new Int32Array(250000);let head=0,tail=1;queue[0]=start;visited[start]=1;
+ while(head<tail){const pos=queue[head++],px=pos%500,py=(pos/500)|0;
+  const neighbors=[];if(px>0)neighbors.push(pos-1);if(px<499)neighbors.push(pos+1);if(py>0)neighbors.push(pos-500);if(py<499)neighbors.push(pos+500);
+  for(const q of neighbors){if(visited[q])continue;visited[q]=1;const k=q*4;
+   if(Math.abs(d[k]-r)+Math.abs(d[k+1]-g)+Math.abs(d[k+2]-b)>65)continue;
+   if(d[k]<110&&d[k+1]<110&&d[k+2]<110)continue;
+   queue[tail++]=q;
+  }
+ }
+ if(tail<2)return false;
+ const original=ctx.getImageData(0,0,500,500),pixels=original.data,chosenEffect=effect,isMagic=glitter;
+ let offset=0,started=performance.now();paintLocked=true;
+ function frame(now){
+  // Around 1.65 seconds for a large region; smaller regions are quicker.
+  const duration=Math.min(2100,Math.max(850,tail/55));
+  const fraction=Math.min(1,(now-started)/duration);const stop=Math.min(tail,Math.max(offset,Math.ceil(tail*fraction)));
+  for(let n=offset;n<stop;n++){const i=queue[n]*4;pixels[i]=rgb[0];pixels[i+1]=rgb[1];pixels[i+2]=rgb[2];pixels[i+3]=255}
+  offset=stop;ctx.putImageData(original,0,0);
+  if(offset<tail){animation=requestAnimationFrame(frame)}else{
+   // A new fill removes any previous glitter/rainbow effects in the same pixels.
+   const filled=new Uint8Array(250000);
+   for(let n=0;n<tail;n++)filled[queue[n]]=1;
+   for(const area of glitterAreas){
+     area.stars=area.stars.filter(p=>!filled[Math.min(249999,Math.max(0,Math.floor(p.y)*500+Math.floor(p.x)))]);
+     if(area.maskCanvas){
+       const mc=area.maskCanvas.getContext('2d'),mi=mc.getImageData(0,0,500,500);
+       for(let n=0;n<tail;n++)mi.data[queue[n]*4+3]=0;
+       mc.putImageData(mi,0,0);
+     }
+   }
+   glitterAreas=glitterAreas.filter(a=>a.stars.length>0||a.maskCanvas);
+   if(isMagic){const area={effect:chosenEffect,stars:makeStars(queue,tail),hue:Math.random()*360};if(chosenEffect==='rainbow'){const mask=document.createElement('canvas');mask.width=mask.height=500;const mc=mask.getContext('2d');let mi=mc.createImageData(500,500);for(let n=0;n<tail;n++){let j=queue[n]*4;mi.data[j+3]=255}mc.putImageData(mi,0,0);area.maskCanvas=mask;area.overlay=document.createElement('canvas');area.overlay.width=area.overlay.height=500;area.overlayCtx=area.overlay.getContext('2d')}glitterAreas.push(area);startGlitter()}
+   paintLocked=false;animation=null;
+  }
+ }
+ animation=requestAnimationFrame(frame);return true;
+}
+function drawLine(a,b){ctx.strokeStyle=color;ctx.lineWidth=brushSize;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();if(glitter){for(let i=0;i<6;i++){let t=Math.random(),x=a.x+(b.x-a.x)*t+(Math.random()-.5)*brushSize,y=a.y+(b.y-a.y)*t+(Math.random()-.5)*brushSize;if(Math.random()<.18){glitterAreas.push({effect,stars:[{x,y,size:1.2+Math.random()*2,phase:Math.random()*6.28,speed:1+Math.random()}]});startGlitter()}}}}
+canvas.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});canvas.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});canvas.addEventListener('pointerdown',e=>{e.preventDefault();if(paintLocked)return;let p=point(e);snapshot();if(mode==='fill'){if(!fillAt(p.x,p.y))history.pop();else $('toast').textContent='Flot! 🌈'}else{painting=true;last=p;canvas.setPointerCapture(e.pointerId);drawLine(p,{x:p.x+.1,y:p.y+.1})}},{passive:false});canvas.addEventListener('pointermove',e=>{if(!painting)return;e.preventDefault();let p=point(e);drawLine(last,p);last=p},{passive:false});canvas.addEventListener('pointerup',()=>painting=false);canvas.addEventListener('pointercancel',()=>painting=false);
+function setMode(m){mode=m;$('fill').classList.toggle('active',m==='fill');$('brush').classList.toggle('active',m==='brush');$('fill').disabled=false;$('toast').textContent=m==='fill'?'Tryk på et felt for at fylde det 🪣':'Mal med fingeren 🖌️'}
+$('fill').onclick=()=>setMode('fill');$('brush').onclick=()=>setMode('brush');$('size').onclick=()=>{brushSize=brushSize===12?24:brushSize===24?40:12;$('size').textContent='● Pensel: '+({12:'lille',24:'mellem',40:'stor'}[brushSize])};
+$('undo').onclick=()=>{if(paintLocked){cancelAnimationFrame(animation);paintLocked=false}if(history.length){let state=history.pop();ctx.putImageData(state.pixels,0,0);glitterAreas=state.areas;$('toast').textContent='Sidste ændring fortrudt ↶'}};
+$('clear').onclick=()=>{if(paintLocked){cancelAnimationFrame(animation);paintLocked=false}if(confirm('Vil du starte forfra med dette billede?')){history=[];if(custom)openRaster(custom);else if(selected>=0)open(selected);else openRaster(uploadedPictures[-selected-1][1])}};
+$('back').onclick=()=>{$('editor').classList.add('hide');$('home').classList.remove('hide');document.body.classList.remove('editing');if(glitterLoop!==null){cancelAnimationFrame(glitterLoop);glitterLoop=null}};
+function renderPalette(){
+ let list=glitter?glitterColors:colors;
+ $('palette').innerHTML=list.map(c=>`<button class="swatch ${glitter?'sparkle':''}" data-color="${c}" style="background:${c}" aria-label="Farve ${c}">${glitter?'✦':''}</button>`).join('');
+ document.querySelectorAll('.swatch').forEach(x=>x.onclick=()=>chooseColor(x.dataset.color));
+ chooseColor(list.includes(color)?color:list[0]);
+ $('effects').classList.toggle('hide',!glitter);$('normalTab').classList.toggle('active',!glitter);
+ $('glitterTab').classList.toggle('active',glitter);
+}
+function chooseColor(c){color=c;document.querySelectorAll('.swatch').forEach(x=>x.classList.toggle('selected',x.dataset.color===c))}
+$('normalTab').onclick=()=>{glitter=false;renderPalette()};
+$('glitterTab').onclick=()=>{glitter=true;renderPalette()};
+renderPalette();
+document.querySelectorAll('.effect').forEach(btn=>btn.onclick=()=>{effect=btn.dataset.effect;document.querySelectorAll('.effect').forEach(b=>b.classList.toggle('active',b===btn))});
+
+$('download').onclick=()=>{let a=document.createElement('a');let saved=document.createElement('canvas');saved.width=saved.height=500;let sc=saved.getContext('2d');sc.drawImage(canvas,0,0);sc.drawImage(glitterCanvas,0,0);a.href=saved.toDataURL('image/png');a.download='magic-coloring.png';a.click();$('toast').textContent='Billedet er klar til at gemme! 💖'};
+document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('touchmove',e=>{if(document.body.classList.contains('editing')&&e.target.closest('#paper'))e.preventDefault()},{passive:false});
+gallery();
+</script></body></html>
